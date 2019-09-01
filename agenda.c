@@ -41,6 +41,26 @@ void realoca_agenda()
     }
 }
 
+    char *pega_nome(void *pessoa)
+    {
+    return pessoa;
+}
+
+char *pega_cpf(void *pessoa)
+    {
+    return pessoa + sizeof(char) * 100;
+}
+
+void *primeira_pessoa()
+    {
+    return pBuffer + sizeof(int);
+}
+
+void *proxima_pessoa(void *pessoa)
+    {
+    return pessoa + sizeof(char) * 200;
+}
+
 void cria_pessoa()
     {
     int *numero_de_pessoas = pBuffer;
@@ -51,7 +71,7 @@ void cria_pessoa()
     nome = pBuffer + sizeof(int) + ((*numero_de_pessoas - 1) * sizeof(char) * 200);
     printf("Digite o nome da pessoa:");
     preenche_string(nome);
-    cpf = nome + (sizeof(char) * 100);
+    cpf = pega_cpf(nome);
     printf("Digite o CPF da pessoa:");
     preenche_string(cpf);
     if (*nome == '\0' || *cpf == '\0')
@@ -63,13 +83,11 @@ void cria_pessoa()
 
 void imprime_agenda()
     {
-    char *inicio = pBuffer;
-    inicio += sizeof(int);
-    char *p;
-    for (p = inicio; *p != '\0'; p += sizeof(char) * 200)
+    void *p;
+    for (p = primeira_pessoa(); (*pega_nome(p)) != '\0'; p = proxima_pessoa(p))
         {
-        printf("Nome: %s\n", p);
-        printf("CPF: %s\n", p + (sizeof(char) * 100 ));;
+        printf("Nome: %s\n", pega_nome(p));
+        printf("CPF: %s\n", pega_cpf(p));
     }
 }
 
