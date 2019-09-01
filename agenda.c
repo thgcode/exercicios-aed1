@@ -25,7 +25,7 @@ void realoca_agenda()
     int *numero_de_pessoas;
     if (pBuffer == NULL)
         {
-        pBuffer = malloc(sizeof(int) + sizeof(char));
+        pBuffer = malloc(sizeof(int) + sizeof(char) + sizeof(int));
         numero_de_pessoas = pBuffer;
         *numero_de_pessoas = 0;
         parada = pBuffer + sizeof(int);
@@ -34,7 +34,7 @@ void realoca_agenda()
     else
         {
         int *numero_de_pessoas = pBuffer;
-        pBuffer = realloc(pBuffer, sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char));
+        pBuffer = realloc(pBuffer, sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char) + sizeof(int));
         numero_de_pessoas = pBuffer;
         parada = pBuffer + sizeof(int) + (sizeof(char) * 200 * *numero_de_pessoas);
         *parada = '\0';
@@ -91,13 +91,36 @@ void imprime_agenda()
     }
 }
 
+int *pega_var_menu()
+    {
+    int *numero_de_pessoas = pBuffer;
+    return pBuffer + sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char);
+}
+
 int main()
     {
+    int *opcao;
     realoca_agenda(); /* Cria agenda vazia */
-    cria_pessoa();
-    imprime_agenda();
-    cria_pessoa();
-    imprime_agenda();
+    opcao = pega_var_menu();
+    while (*opcao != 3)
+        {
+        printf("Menu da agenda:\n");
+        printf("1. Adicionar uma pessoa\n");
+        printf("2. Imprimir a lista de pessoas\n");
+        printf("3. Sair:\n");
+        scanf("%d", opcao);
+        while (getchar() != '\n');
+        switch (*opcao)
+            {
+            case 1:
+                cria_pessoa();
+                opcao = pega_var_menu();
+                break;
+            case 2:
+                imprime_agenda();
+                break;
+        }
+    }
     free(pBuffer);
     return 0;
 }
