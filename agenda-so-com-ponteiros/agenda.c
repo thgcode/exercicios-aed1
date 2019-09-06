@@ -143,10 +143,11 @@ void procura_pessoa_e_imprime()
 
 int main()
     {
-    int *opcao;
+    int *opcao, *numero_de_pessoas;
     realoca_agenda(); /* Cria agenda vazia */
+    numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 4)
+    while (*opcao != 4 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
@@ -160,12 +161,16 @@ int main()
             case 1:
                 cria_pessoa();
                 opcao = pega_var_menu();
+                numero_de_pessoas = pBuffer;
                 break;
             case 2:
                 imprime_agenda();
                 break;
             case 3:
                 procura_pessoa_e_imprime();
+                break;
+            case 4:
+                *numero_de_pessoas = -1;
                 break;
         }
     }
