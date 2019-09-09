@@ -91,10 +91,10 @@ void cria_pessoa()
     }
 }
 
-void imprime_pessoa(void *p)
+void imprime_pessoa(void *pessoa)
     {
-    printf("Nome: %s\n", pega_nome(p));
-    printf("CPF: %s\n", pega_cpf(p));
+    printf("Nome: %s\n", pega_nome(pessoa));
+    printf("CPF: %s\n", pega_cpf(pessoa));
 }
 
 void imprime_agenda()
@@ -141,19 +141,43 @@ void procura_pessoa_e_imprime()
     }
 }
 
+void apaga_pessoa()
+    {
+    void *p = procura_pessoa();
+    void *proxima;
+    int *numero_de_pessoas;
+    if (p != NULL)
+        {
+        for (proxima = proxima_pessoa(p); (*pega_nome(proxima)) != '\0'; p = proxima, proxima = proxima_pessoa(proxima))
+            {
+            strcpy(pega_nome(p), pega_nome(proxima));
+            strcpy(pega_cpf(p), pega_cpf(proxima));
+        }
+        numero_de_pessoas = pBuffer;
+        (*numero_de_pessoas)--;
+        realoca_agenda();
+        printf("Pessoa apagada.\n");
+    }
+    else
+        {
+        printf("Pessoa nao encontrada.\n");
+    }
+}
+
 int main()
     {
     int *opcao, *numero_de_pessoas;
     realoca_agenda(); /* Cria agenda vazia */
     numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 4 || *numero_de_pessoas != -1)
+    while (*opcao != 5 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
         printf("2. Imprimir a lista de pessoas\n");
     printf("3. Procurar uma pessoa\n");
-        printf("4. Sair:\n");
+    printf("4. Apagar uma pessoa\n");
+        printf("5. Sair:\n");
         scanf("%d", opcao);
         while (getchar() != '\n');
         switch (*opcao)
@@ -170,6 +194,11 @@ int main()
                 procura_pessoa_e_imprime();
                 break;
             case 4:
+                apaga_pessoa();
+                opcao = pega_var_menu();
+                numero_de_pessoas = pBuffer;
+                break;
+            case 5:
                 *numero_de_pessoas = -1;
                 break;
         }
