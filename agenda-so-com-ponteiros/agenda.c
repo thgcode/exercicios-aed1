@@ -35,7 +35,8 @@ void realoca_agenda()
     int *numero_de_pessoas;
     if (pBuffer == NULL)
         {
-        pBuffer = malloc(sizeof(int) + sizeof(char) + sizeof(int) + sizeof(char) * 100);
+        pBuffer = malloc(sizeof(int) + sizeof(char) + sizeof(int) + sizeof(char) * 100 + sizeof(char) *
+200);
         numero_de_pessoas = pBuffer;
         *numero_de_pessoas = 0;
         parada = pBuffer + sizeof(int);
@@ -44,7 +45,7 @@ void realoca_agenda()
     else
         {
         int *numero_de_pessoas = pBuffer;
-        pBuffer = realloc(pBuffer, sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char) + sizeof(int) + sizeof(char) * 100);
+        pBuffer = realloc(pBuffer, sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char) + sizeof(int) + sizeof(char) * 100 + sizeof(char) * 200);
         numero_de_pessoas = pBuffer;
         parada = pBuffer + sizeof(int) + (sizeof(char) * 200 * *numero_de_pessoas);
         *parada = '\0';
@@ -64,6 +65,11 @@ char *pega_cpf(void *pessoa)
 void *primeira_pessoa()
     {
     return pBuffer + sizeof(int);
+}
+
+void *pessoa_anterior(void *pessoa)
+    {
+    return pessoa - sizeof(char) * 200;
 }
 
 void *proxima_pessoa(void *pessoa)
@@ -112,6 +118,11 @@ void imprime_agenda()
     return pBuffer + sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char) + sizeof(int);
 }
 
+    void *pega_area_de_troca()
+    {
+    int *numero_de_pessoas = pBuffer;
+    return pBuffer + sizeof(int) + ((sizeof(char) * 200) * *numero_de_pessoas) + sizeof(char) + sizeof(int) + sizeof(char) * 100;
+}
 void *procura_pessoa()
     {
     char *nome = pega_area_pra_digitar();
@@ -188,8 +199,27 @@ void ordena_por_selecao()
                 menor = j;
             }
         }
-        printf("Fez troca");
         troca_pessoa(i, menor);
+    }
+}
+
+void ordena_por_insercao()
+    {
+    void *i, *j, *tmp;
+    for (j = proxima_pessoa(primeira_pessoa()); (*pega_nome(j) != '\0'); j = proxima_pessoa(j))
+        {
+        i = pessoa_anterior(j);
+        tmp = pega_area_de_troca();
+        strcpy(tmp, pega_nome(j));
+        strcpy(tmp + sizeof(char) * 100, pega_cpf(j));
+        while (i >= primeira_pessoa() && strcmp(pega_nome(i), pega_nome(tmp)) > 0)
+            {
+            strcpy(pega_nome(proxima_pessoa(i)), pega_nome(i));
+            strcpy(pega_cpf(proxima_pessoa(i)), pega_cpf(i));
+            i = pessoa_anterior(i);
+        }
+        strcpy(proxima_pessoa(i), tmp); /* Copia o nome */
+        strcpy(proxima_pessoa(i) + sizeof(char) * 100, tmp + sizeof(char) * 100); /* Copia o CPF */
     }
 }
 
@@ -199,7 +229,7 @@ int main()
     realoca_agenda(); /* Cria agenda vazia */
     numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 6 || *numero_de_pessoas != -1)
+    while (*opcao != 7 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
@@ -207,7 +237,8 @@ int main()
     printf("3. Procurar uma pessoa\n");
     printf("4. Apagar uma pessoa\n");
     printf("5. Ordenar por selecao\n");
-        printf("6. Sair:\n");
+        printf("6. Ordenar por insercao\n");
+        printf("7. Sair:\n");
         scanf("%d", opcao);
         while (getchar() != '\n');
         switch (*opcao)
@@ -232,6 +263,9 @@ int main()
                 ordena_por_selecao();
                 break;
             case 6:
+                ordena_por_insercao();
+                break;
+            case 7:
                 *numero_de_pessoas = -1;
                 break;
         }
