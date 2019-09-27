@@ -164,20 +164,50 @@ void apaga_pessoa()
     }
 }
 
+void troca_pessoa(void *primeira, void *segunda)
+    {
+    strcpy(pega_area_pra_digitar(), pega_nome(primeira));
+    strcpy(pega_nome(primeira), pega_nome(segunda));
+    strcpy(pega_nome(segunda), pega_area_pra_digitar());
+    strcpy(pega_area_pra_digitar(), pega_cpf(primeira));
+    strcpy(pega_cpf(primeira), pega_cpf(segunda));
+    strcpy(pega_area_pra_digitar(), pega_cpf(segunda));
+    *pega_area_pra_digitar() = '\0';
+}
+
+void ordena_por_selecao()
+    {
+    void *i, *j, *menor;
+    for (i = primeira_pessoa(); (*pega_nome(i) != '\0'); i = proxima_pessoa(i))
+        {
+        menor = i;
+        for (j = proxima_pessoa(i); (*pega_nome(j) != '\0'); j = proxima_pessoa(j))
+            {
+            if (strcmp(pega_nome(i), pega_nome(j)) > 0)
+                {
+                menor = j;
+            }
+        }
+        printf("Fez troca");
+        troca_pessoa(i, menor);
+    }
+}
+
 int main()
     {
     int *opcao, *numero_de_pessoas;
     realoca_agenda(); /* Cria agenda vazia */
     numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 5 || *numero_de_pessoas != -1)
+    while (*opcao != 6 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
         printf("2. Imprimir a lista de pessoas\n");
     printf("3. Procurar uma pessoa\n");
     printf("4. Apagar uma pessoa\n");
-        printf("5. Sair:\n");
+    printf("5. Ordenar por selecao\n");
+        printf("6. Sair:\n");
         scanf("%d", opcao);
         while (getchar() != '\n');
         switch (*opcao)
@@ -199,6 +229,9 @@ int main()
                 numero_de_pessoas = pBuffer;
                 break;
             case 5:
+                ordena_por_selecao();
+                break;
+            case 6:
                 *numero_de_pessoas = -1;
                 break;
         }
