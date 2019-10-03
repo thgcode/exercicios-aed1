@@ -223,13 +223,28 @@ void ordena_por_insercao()
     }
 }
 
+void ordena_por_bolha()
+    {
+    void *i, *j;
+    for (i = primeira_pessoa(); (*pega_nome(i) != '\0'); i = proxima_pessoa(i))
+        {
+        for (j = proxima_pessoa(i); (*pega_nome(j) != '\0'); j = proxima_pessoa(j))
+            {
+            if (strcmp(pega_nome(i), pega_nome(j)) > 0)
+                {
+                troca_pessoa(i, j);
+            }
+        }
+    }
+}
+
 int main()
     {
     int *opcao, *numero_de_pessoas;
     realoca_agenda(); /* Cria agenda vazia */
     numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 7 || *numero_de_pessoas != -1)
+    while (*opcao != 8 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
@@ -238,7 +253,8 @@ int main()
     printf("4. Apagar uma pessoa\n");
     printf("5. Ordenar por selecao\n");
         printf("6. Ordenar por insercao\n");
-        printf("7. Sair:\n");
+        printf("7. Ordenar por bolha\n");
+        printf("8. Sair:\n");
         scanf("%d", opcao);
         while (getchar() != '\n');
         switch (*opcao)
@@ -266,6 +282,9 @@ int main()
                 ordena_por_insercao();
                 break;
             case 7:
+                ordena_por_bolha();
+                break;
+            case 8:
                 *numero_de_pessoas = -1;
                 break;
         }
