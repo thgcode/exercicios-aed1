@@ -177,13 +177,16 @@ void apaga_pessoa()
 
 void troca_pessoa(void *primeira, void *segunda)
     {
-    strcpy(pega_area_pra_digitar(), pega_nome(primeira));
-    strcpy(pega_nome(primeira), pega_nome(segunda));
-    strcpy(pega_nome(segunda), pega_area_pra_digitar());
-    strcpy(pega_area_pra_digitar(), pega_cpf(primeira));
-    strcpy(pega_cpf(primeira), pega_cpf(segunda));
-    strcpy(pega_area_pra_digitar(), pega_cpf(segunda));
-    *pega_area_pra_digitar() = '\0';
+        if (primeira != segunda)
+        {
+        strcpy(pega_area_pra_digitar(), pega_nome(primeira));
+        strcpy(pega_nome(primeira), pega_nome(segunda));
+        strcpy(pega_nome(segunda), pega_area_pra_digitar());
+        strcpy(pega_area_pra_digitar(), pega_cpf(primeira));
+        strcpy(pega_cpf(primeira), pega_cpf(segunda));
+        strcpy(pega_area_pra_digitar(), pega_cpf(segunda));
+        *pega_area_pra_digitar() = '\0';
+    }
 }
 
 void ordena_por_selecao()
@@ -238,13 +241,48 @@ void ordena_por_bolha()
     }
 }
 
+void ordena_por_quicksort(void *inicio, void *fim)
+    {
+    void *pivo, *i, *j;
+    i = inicio;
+    j = fim;
+    pivo = pega_area_de_troca();
+    strcpy(pega_area_de_troca(), pega_nome(inicio));
+    do
+        {
+        while (strcmp(pega_nome(i), pivo) < 0)
+            {
+            i = proxima_pessoa(i);
+        }
+        while(strcmp(pega_nome(j), pivo) > 0)
+            {
+            j = pessoa_anterior(j);
+        }
+        if (i <= j)
+            {
+            troca_pessoa(i, j);
+            i = proxima_pessoa(i);
+            j = pessoa_anterior(j);
+        }
+    }
+    while (i <= j);
+    if (inicio < j)
+        {
+        ordena_por_quicksort(inicio, j);
+    }
+    if (i < fim)
+        {
+        ordena_por_quicksort(i, fim);
+    }
+}
+
 int main()
     {
     int *opcao, *numero_de_pessoas;
     realoca_agenda(); /* Cria agenda vazia */
     numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 8 || *numero_de_pessoas != -1)
+    while (*opcao != 9 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
@@ -254,7 +292,8 @@ int main()
     printf("5. Ordenar por selecao\n");
         printf("6. Ordenar por insercao\n");
         printf("7. Ordenar por bolha\n");
-        printf("8. Sair:\n");
+        printf("8. Ordenar por quicksort\n");
+        printf("9. Sair:\n");
         scanf("%d", opcao);
         while (getchar() != '\n');
         switch (*opcao)
@@ -285,6 +324,9 @@ int main()
                 ordena_por_bolha();
                 break;
             case 8:
+                ordena_por_quicksort(primeira_pessoa(), primeira_pessoa() + (sizeof(char) * 200 * (*numero_de_pessoas - 1)));
+                break;
+            case 9:
                 *numero_de_pessoas = -1;
                 break;
         }
