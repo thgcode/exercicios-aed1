@@ -35,8 +35,7 @@ void realoca_agenda()
     int *numero_de_pessoas;
     if (pBuffer == NULL)
         {
-        pBuffer = malloc(sizeof(int) + sizeof(char) + sizeof(int) + sizeof(char) * 100 + sizeof(char) *
-200);
+        pBuffer = malloc(sizeof(int) + sizeof(char) + sizeof(int) + sizeof(char) * 100 + sizeof(char) * 200);
         numero_de_pessoas = pBuffer;
         *numero_de_pessoas = 0;
         parada = pBuffer + sizeof(int);
@@ -65,6 +64,12 @@ char *pega_cpf(void *pessoa)
 void *primeira_pessoa()
     {
     return pBuffer + sizeof(int);
+}
+
+void *ultima_pessoa()
+    {
+    int *numero_de_pessoas = pBuffer;
+    return primeira_pessoa() + (sizeof(char) * 200 * (*numero_de_pessoas - 1));
 }
 
 void *pessoa_anterior(void *pessoa)
@@ -276,13 +281,60 @@ void ordena_por_quicksort(void *inicio, void *fim)
     }
 }
 
+void merge(void *inicio, void *meio, void *fim)
+    {
+    void *i = meio;
+    while (inicio <= meio || i <= fim)
+        {
+        if (inicio <= meio && i <= fim)
+            {
+            if (strcmp(inicio, i) > 0)
+                {
+                troca_pessoa(inicio, i);
+                inicio = proxima_pessoa(inicio);
+            }
+            else
+                {
+                i = proxima_pessoa(i);
+            }
+        }
+        else if (inicio <= meio)
+            {
+            inicio = proxima_pessoa(i);
+        }
+        else if (i <= fim)
+            {
+            i = proxima_pessoa(i);
+        }
+    }
+}
+
+void ordena_por_mergesort(void *inicio, void *fim)
+    {
+    void *meio;
+    if (inicio == fim)
+        {
+        return;
+    }
+    meio = inicio + ((fim - inicio) / (sizeof(char) * 200) / 2) * sizeof(char) * 200;
+    if (inicio != meio)
+        {
+        ordena_por_mergesort(inicio, meio);
+    }
+    if (proxima_pessoa(meio) != fim)
+        {
+        ordena_por_mergesort(proxima_pessoa(meio), fim);
+    }
+    merge(inicio, meio, fim);
+}
+
 int main()
     {
     int *opcao, *numero_de_pessoas;
     realoca_agenda(); /* Cria agenda vazia */
     numero_de_pessoas = pBuffer;
     opcao = pega_var_menu();
-    while (*opcao != 9 || *numero_de_pessoas != -1)
+    while (*opcao != 10 || *numero_de_pessoas != -1)
         {
         printf("Menu da agenda:\n");
         printf("1. Adicionar uma pessoa\n");
@@ -293,7 +345,8 @@ int main()
         printf("6. Ordenar por insercao\n");
         printf("7. Ordenar por bolha\n");
         printf("8. Ordenar por quicksort\n");
-        printf("9. Sair:\n");
+        printf("9. Ordenar por mergesort\n");
+        printf("10. Sair:\n");
         scanf("%d", opcao);
         while (getchar() != '\n');
         switch (*opcao)
@@ -324,9 +377,12 @@ int main()
                 ordena_por_bolha();
                 break;
             case 8:
-                ordena_por_quicksort(primeira_pessoa(), primeira_pessoa() + (sizeof(char) * 200 * (*numero_de_pessoas - 1)));
+                ordena_por_quicksort(primeira_pessoa(), ultima_pessoa());
                 break;
             case 9:
+                ordena_por_mergesort(primeira_pessoa(), ultima_pessoa());
+                break;
+            case 10:
                 *numero_de_pessoas = -1;
                 break;
         }
